@@ -1,0 +1,21 @@
+{
+  "name": "pinboard-alfred",
+  "version": "0.0.0",
+  "description": "Search Pinboard Bookmarks",
+  "main": "search.js",
+  "dependencies": {
+    "lockfile": "~0.3.0",
+    "request": "~2.16.2",
+    "async": "~0.2.6",
+    "mkdirp": "~0.3.5",
+    "xml-writer": "~1.2.4",
+    "natural": "~0.1.19"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": "",
+  "author": "Ekin Koc",
+  "license": "MIT"
+}
