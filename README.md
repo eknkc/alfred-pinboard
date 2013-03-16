@@ -3,9 +3,9 @@ alfred-pinboard
 
 Pinboard Search Weorkflow for Alfred 2
 
-Discussion: http://www.alfredforum.com/topic/979-pinboard-search-workflow/
+Install: http://d.eknkc.com/t0PO
 
-Install: http://d.eknkc.com/ipIl
+Discussion: http://www.alfredforum.com/topic/979-pinboard-search-workflow/
 
 ## License
 MIT
