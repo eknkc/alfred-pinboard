@@ -146,6 +146,12 @@ async.auto({
     }
   }]
 }, function (err, data) {
+  if (!data.cache.date || data.cache.date < (Date.now() - 1000 * 60 * 10)) {
+    data.spawn = true;
+    data.cache.date = Date.now();
+    data.cache.dirty = true;
+  }
+
   if (data.config.dirty) {
     delete data.config.dirty;
     fs.writeFileSync(data.configFile, JSON.stringify(data.config), "utf8");
@@ -183,14 +189,14 @@ async.auto({
         .writeElement("subtitle", entry.extended || entry.href);
       out.endElement();
     });
-
-    if (!data.cache.date || data.cache.date < (Date.now() - 1000 * 60 * 10)) {
-      spawn(process.execPath, [__filename, "--reindex"], { detached: true, stdio: "ignore" });
-    }
   }
 
   out.endElement("items");
   out.endDocument();
+
+  if (data.spawn) {
+    spawn(process.execPath, [__filename, "--reindex"], { detached: true, stdio: "ignore" });
+  }
 
   process.exit(0);
 });
