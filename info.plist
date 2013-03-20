@@ -6,11 +6,76 @@
 	<string>eknkc.pinboard</string>
 	<key>connections</key>
 	<dict>
+		<key>48C31E7C-B1AB-4779-BB9E-7978D0CA82FF</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>4DB6E16D-3FE1-4717-BE26-411C79E3F6BF</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+			</dict>
+		</array>
+		<key>497F4289-E537-4469-9BE6-2023C6541166</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>A9744C25-61B3-4BBA-8BDE-49A063FB0D80</string>
+				<key>modifiers</key>
+				<integer>262144</integer>
+				<key>modifiersubtext</key>
+				<string>Delete from Pinboard</string>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>3D12FDF4-E529-4531-AA62-BA0F5AA71C76</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>E327DA88-1CC2-4264-84BE-7F898B979C7F</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+			</dict>
+		</array>
 		<key>4C6208EB-6C15-499F-9DE2-BAB11A9FEE47</key>
 		<array>
 			<dict>
 				<key>destinationuid</key>
+				<string>2646381A-24C5-44E5-A99D-D7EFFE463815</string>
+				<key>modifiers</key>
+				<integer>1048576</integer>
+				<key>modifiersubtext</key>
+				<string>Copy URL to clipboard</string>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>A9744C25-61B3-4BBA-8BDE-49A063FB0D80</string>
+				<key>modifiers</key>
+				<integer>262144</integer>
+				<key>modifiersubtext</key>
+				<string>Delete from Pinboard</string>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
 				<string>3D12FDF4-E529-4531-AA62-BA0F5AA71C76</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+			</dict>
+		</array>
+		<key>4DB6E16D-3FE1-4717-BE26-411C79E3F6BF</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>CCFF7B23-B263-4DB8-AF00-3C8CDEC9B170</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -39,6 +104,28 @@
 				<string></string>
 			</dict>
 		</array>
+		<key>A9744C25-61B3-4BBA-8BDE-49A063FB0D80</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>CCFF7B23-B263-4DB8-AF00-3C8CDEC9B170</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+			</dict>
+		</array>
+		<key>E327DA88-1CC2-4264-84BE-7F898B979C7F</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>CCFF7B23-B263-4DB8-AF00-3C8CDEC9B170</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+			</dict>
+		</array>
 	</dict>
 	<key>createdby</key>
 	<string>Ekin Koc</string>
@@ -50,6 +137,35 @@
 	<string>Pinboard</string>
 	<key>objects</key>
 	<array>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>autopaste</key>
+				<true/>
+				<key>clipboardtext</key>
+				<string>{query}</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.output.clipboard</string>
+			<key>uid</key>
+			<string>2646381A-24C5-44E5-A99D-D7EFFE463815</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>escaping</key>
+				<integer>63</integer>
+				<key>script</key>
+				<string>PATH=/usr/bin:/usr/local/bin node search.js --reindex &gt; /dev/null
+echo "Completed reload"</string>
+				<key>type</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>4DB6E16D-3FE1-4717-BE26-411C79E3F6BF</string>
+		</dict>
 		<dict>
 			<key>config</key>
 			<dict>
@@ -77,43 +193,26 @@
 			<key>config</key>
 			<dict>
 				<key>argumenttype</key>
-				<integer>0</integer>
+				<integer>2</integer>
 				<key>escaping</key>
 				<integer>63</integer>
 				<key>keyword</key>
-				<string>pb</string>
-				<key>runningsubtext</key>
-				<string>Loading bookmarks</string>
+				<string>pbunread</string>
 				<key>script</key>
-				<string>PATH=/usr/bin:/usr/local/bin node search.js "{query}"</string>
+				<string>PATH=/usr/bin:/usr/local/bin node search.js --toread</string>
 				<key>subtext</key>
-				<string>Search Pinboard bookmarks for {query}</string>
+				<string>List Pinboard bookmarks in your reading list</string>
 				<key>title</key>
-				<string>Search Pinboard</string>
+				<string>Unread Items in Pinboard</string>
 				<key>type</key>
 				<integer>0</integer>
 				<key>withspace</key>
-				<true/>
+				<false/>
 			</dict>
 			<key>type</key>
 			<string>alfred.workflow.input.scriptfilter</string>
 			<key>uid</key>
-			<string>4C6208EB-6C15-499F-9DE2-BAB11A9FEE47</string>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>escaping</key>
-				<integer>63</integer>
-				<key>script</key>
-				<string>open {query}</string>
-				<key>type</key>
-				<integer>0</integer>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.action.script</string>
-			<key>uid</key>
-			<string>9FAA905B-B3E1-42A3-B714-F7A0FED469BF</string>
+			<string>497F4289-E537-4469-9BE6-2023C6541166</string>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -148,6 +247,78 @@
 		<dict>
 			<key>config</key>
 			<dict>
+				<key>escaping</key>
+				<integer>63</integer>
+				<key>script</key>
+				<string>PATH=/usr/bin:/usr/local/bin node delete.js --url "{query}"</string>
+				<key>type</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>A9744C25-61B3-4BBA-8BDE-49A063FB0D80</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>lastpathcomponent</key>
+				<false/>
+				<key>onlyshowifquerypopulated</key>
+				<false/>
+				<key>output</key>
+				<integer>0</integer>
+				<key>removeextension</key>
+				<false/>
+				<key>sticky</key>
+				<false/>
+				<key>text</key>
+				<string>{query}</string>
+				<key>title</key>
+				<string>Pinboard</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.output.notification</string>
+			<key>uid</key>
+			<string>CCFF7B23-B263-4DB8-AF00-3C8CDEC9B170</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>escaping</key>
+				<integer>63</integer>
+				<key>script</key>
+				<string>PATH=/usr/bin:/usr/local/bin node markread.js --url "{query}"</string>
+				<key>type</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>E327DA88-1CC2-4264-84BE-7F898B979C7F</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>argumenttype</key>
+				<integer>2</integer>
+				<key>keyword</key>
+				<string>pbreload</string>
+				<key>subtext</key>
+				<string>Clears cache and loads latest bookmarks from Pinboard.in</string>
+				<key>text</key>
+				<string>Reload Pinboard data</string>
+				<key>withspace</key>
+				<false/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.keyword</string>
+			<key>uid</key>
+			<string>48C31E7C-B1AB-4779-BB9E-7978D0CA82FF</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
 				<key>argumenttype</key>
 				<integer>0</integer>
 				<key>keyword</key>
@@ -164,6 +335,33 @@
 			<key>uid</key>
 			<string>5D754C1D-ED7B-46CC-811D-FC262AE673BE</string>
 		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>argumenttype</key>
+				<integer>0</integer>
+				<key>escaping</key>
+				<integer>63</integer>
+				<key>keyword</key>
+				<string>pb</string>
+				<key>runningsubtext</key>
+				<string>Loading bookmarks</string>
+				<key>script</key>
+				<string>PATH=/usr/bin:/usr/local/bin node search.js --q "{query}"</string>
+				<key>subtext</key>
+				<string>Search Pinboard bookmarks for {query}</string>
+				<key>title</key>
+				<string>Search Pinboard</string>
+				<key>type</key>
+				<integer>0</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>4C6208EB-6C15-499F-9DE2-BAB11A9FEE47</string>
+		</dict>
 	</array>
 	<key>readme</key>
 	<string></string>
@@ -172,35 +370,65 @@
 		<key>1E414136-39D3-4EB0-83BC-54047954BBD9</key>
 		<dict>
 			<key>ypos</key>
-			<real>130</real>
+			<real>10</real>
+		</dict>
+		<key>2646381A-24C5-44E5-A99D-D7EFFE463815</key>
+		<dict>
+			<key>ypos</key>
+			<real>140</real>
 		</dict>
 		<key>3D12FDF4-E529-4531-AA62-BA0F5AA71C76</key>
 		<dict>
 			<key>ypos</key>
-			<real>10</real>
+			<real>260</real>
+		</dict>
+		<key>48C31E7C-B1AB-4779-BB9E-7978D0CA82FF</key>
+		<dict>
+			<key>ypos</key>
+			<real>520</real>
+		</dict>
+		<key>497F4289-E537-4469-9BE6-2023C6541166</key>
+		<dict>
+			<key>ypos</key>
+			<real>400</real>
 		</dict>
 		<key>4C6208EB-6C15-499F-9DE2-BAB11A9FEE47</key>
 		<dict>
 			<key>ypos</key>
-			<real>10</real>
+			<real>140</real>
+		</dict>
+		<key>4DB6E16D-3FE1-4717-BE26-411C79E3F6BF</key>
+		<dict>
+			<key>ypos</key>
+			<real>650</real>
 		</dict>
 		<key>5D754C1D-ED7B-46CC-811D-FC262AE673BE</key>
 		<dict>
 			<key>ypos</key>
-			<real>130</real>
+			<real>10</real>
 		</dict>
 		<key>7F35683F-C0C0-4788-B97F-5A1C55ACECD0</key>
 		<dict>
 			<key>ypos</key>
-			<real>130</real>
+			<real>10</real>
 		</dict>
-		<key>9FAA905B-B3E1-42A3-B714-F7A0FED469BF</key>
+		<key>A9744C25-61B3-4BBA-8BDE-49A063FB0D80</key>
 		<dict>
 			<key>ypos</key>
-			<real>10</real>
+			<real>250</real>
+		</dict>
+		<key>CCFF7B23-B263-4DB8-AF00-3C8CDEC9B170</key>
+		<dict>
+			<key>ypos</key>
+			<real>380</real>
+		</dict>
+		<key>E327DA88-1CC2-4264-84BE-7F898B979C7F</key>
+		<dict>
+			<key>ypos</key>
+			<real>530</real>
 		</dict>
 	</dict>
 	<key>webaddress</key>
-	<string>http://github.com/eknkc/pinboard-alfred</string>
+	<string>http://github.com/eknkc/alfred-pinboard</string>
 </dict>
 </plist>

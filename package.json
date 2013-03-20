@@ -9,7 +9,8 @@
     "async": "~0.2.6",
     "mkdirp": "~0.3.5",
     "xml-writer": "~1.2.4",
-    "natural": "~0.1.19"
+    "natural": "~0.1.19",
+    "optimist": "~0.3.5"
   },
   "devDependencies": {},
   "scripts": {

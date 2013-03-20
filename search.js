@@ -1,5 +1,6 @@
-var lockfile = require('lockfile');
 var spawn = require("child_process").spawn;
+var argv = require('optimist').argv;
+argv.q = argv.q || "";
 var async = require('async');
 var request = require('request');
 var fs = require('fs');
@@ -11,8 +12,6 @@ var xml = require("xml-writer");
 var out = new xml(false, function (str, encoding) {
   process.stdout.write(str, encoding);
 });
-
-var arg = process.argv[2];
 
 async.auto({
   configFile: function (next) {
@@ -52,8 +51,8 @@ async.auto({
     })
   }],
   checkAuth: ["config", "cache", function (next, data) {
-    if (arg == "--pbtoken" && /^[^:]+:[0-9A-Z]+$/.test((process.argv[3] || "").trim())) {
-      data.config.token = process.argv[3].trim();
+    if (argv.pbtoken && /^[^:]+:[0-9A-Z]+$/.test(argv.pbtoken)) {
+      data.config.token = argv.pbtoken;
       data.config.dirty = true;
 
       data.cache = {
@@ -68,103 +67,105 @@ async.auto({
 
     return process.nextTick(function() { next(null, true); });
   }],
-  checkReindex: ["cache", function (next, data) {
-    if (arg != '--reindex')
+  ensureData: ["checkAuth", "cache", function (next, data) {
+    if (argv.reindex) {
+      data.cache = { dirty: true };
+    }
+
+    if (data.cache && data.cache.entries)
       return process.nextTick(next);
 
-    arg = "";
-    data.cache = {
-      dirty: true
-    };
+    request({
+      method: "GET",
+      url: "https://api.pinboard.in/v1/posts/all",
+      qs: { auth_token: data.config.token, format: "json" }
+    }, function (err, res, body) {
+      if (err) return next(err);
+      if (res.statusCode == 401) return next(new Error("NoAuthentication"));
+      if (res.statusCode != 200) return next(new Error("UnknownError"));
 
-    return process.nextTick(next);
+      data.cache = {
+        entries: JSON.parse(body),
+        dirty: true,
+        date: Date.now()
+      };
+
+      data.cache.entries.forEach(function (data) {
+        data.keywords = [data.description, data.extended, data.tags].join(" ").tokenizeAndStem();
+      });
+
+      next();
+    });
   }],
-  search: ["checkAuth", "checkReindex", function (next, data) {
-    if (!data.cache.entries) {
-      return reload(function (err) {
-        if (err) return next(err);
-        search(next);
+  search: ["ensureData", function (next, data) {
+    var keywords = argv.q.tokenizeAndStem().map(function (kw) {
+      return new RegExp(kw.replace(/(?=[\\^$*+?.()|{}[\]])/g, "\\"), "gi");
+    });
+
+    if (!keywords.length)
+      return process.nextTick(function() { next(null, []); });
+
+    var results = data.cache.entries
+    .map(function (entry) {
+      var matches = 1;
+      keywords.forEach(function (kw) {
+        matches *= entry.keywords.filter(function (ekw) {
+          return kw.test(ekw);
+        }).length;
       });
-    }
+      return {
+        entry: entry,
+        matches: matches
+      }
+    })
+    .filter(function (data) {
+      return data.matches;
+    });
 
-    search(next);
+    results.sort(function (a, b) {
+      return b.matches - a.matches;
+    });
 
-    function search(next) {
-      var keywords = arg.tokenizeAndStem().map(function (kw) {
-        return new RegExp(kw.replace(/(?=[\\^$*+?.()|{}[\]])/g, "\\"), "gi");
-      });
+    next(null, results.slice(0, 8));
+  }],
+  unread: ["ensureData", function(next, data) {
+    if (!argv.toread)
+      return process.nextTick(function() { next(null, []); });
 
-      if (!keywords.length)
-        return process.nextTick(function() { next(null, []); });
+    var results = data.cache.entries
+    .filter(function (data) {
+      return data.toread == "yes";
+    });
 
-      var results = data.cache.entries
-      .map(function (entry) {
-        var matches = 1;
-        keywords.forEach(function (kw) {
-          matches *= entry.keywords.filter(function (ekw) {
-            return kw.test(ekw);
-          }).length;
-        });
-        return {
-          entry: entry,
-          matches: matches
-        }
-      })
-      .filter(function (data) {
-        return data.matches;
-      });
+    results.sort(function (a, b) {
+      return b.date - a.date;
+    });
 
-      results.sort(function (a, b) {
-        return b.matches - a.matches;
-      });
-
-      next(null, results.slice(0, 8));
-    }
-
-    function reload(next) {
-      request({
-        method: "GET",
-        url: "https://api.pinboard.in/v1/posts/all",
-        qs: { auth_token: data.config.token, format: "json" }
-      }, function (err, res, body) {
-        if (err) return next(err);
-        if (res.statusCode == 401) return next(new Error("NoAuthentication"));
-        if (res.statusCode != 200) return next(new Error("UnknownError"));
-
-        data.cache = {
-          entries: JSON.parse(body),
-          dirty: true,
-          date: Date.now()
-        };
-
-        data.cache.entries.forEach(function (data) {
-          data.keywords = [data.description, data.extended, data.tags].join(" ").tokenizeAndStem();
-        });
-
-        next();
-      });
-    }
+    next(null, results.slice(0, 8).map(function (data) {
+      return {
+        entry: data
+      }
+    }));
+  }],
+  results: ["unread", "search", function (next, data) {
+    return process.nextTick(function() { next(null, data.unread.concat(data.search)); });
   }]
 }, function (err, data) {
-  if (!data.cache.date || data.cache.date < (Date.now() - 1000 * 60 * 10)) {
+  if (!data.checkReindex && data.cache && data.cache.date && data.cache.date < (Date.now() - 1000 * 60 * 10)) {
     data.spawn = true;
+    data.cache = data.cache || {};
     data.cache.date = Date.now();
     data.cache.dirty = true;
   }
 
-  if (data.config.dirty) {
+  if (data.config && data.configFile && data.config.dirty) {
     delete data.config.dirty;
     fs.writeFileSync(data.configFile, JSON.stringify(data.config), "utf8");
   }
 
-  if (data.cache.dirty) {
+  if (data.cache && data.cacheFile && data.cache.dirty) {
     delete data.cache.dirty;
     fs.writeFileSync(data.cacheFile, JSON.stringify(data.cache), "utf8");
-  }
-
-  if (err && ["NoAuthentication"].indexOf(err.message) < 0) {
-    console.error(err.message);
-    process.exit(-1)
   }
 
   out.startDocument();
@@ -173,12 +174,39 @@ async.auto({
   if (err && err.message == "NoAuthentication") {
     out.startElement("item")
       .writeAttribute('uid', "notoken")
+      .writeAttribute('valid', "no")
       .writeElement('icon', "icon.png")
       .writeElement("title", "Please set your authentication token")
       .writeElement("subtitle", "You can use <pinboardauth TOKEN> to set your auth token.");
     out.endElement();
+  } else if (err) {
+    out.startElement("item")
+      .writeAttribute('uid', "error")
+      .writeAttribute('valid', "no")
+      .writeElement('icon', "icon.png")
+      .writeElement("title", "Pinboard Search Error:")
+      .writeElement("subtitle", err.message);
+    out.endElement();
+  } else if (!data.results || !data.results.length) {
+    out.startElement("item")
+      .writeAttribute('uid', "noresults");
+
+    if (!argv.toread)
+      out.writeAttribute('arg', "https://pinboard.in/search/?query=" + encodeURIComponent(argv.q));
+    else
+      out.writeAttribute('valid', "no");
+
+    out.writeElement('icon', "icon.png")
+      .writeElement("title", "No Results");
+
+    if (!argv.toread)
+      out.writeElement("subtitle", "No bookmarks found. Search Pinboard wesite for: " + argv.q);
+    else
+      out.writeElement("subtitle", "You have no unread bookmarks.");
+
+    out.endElement();
   } else {
-    data.search.forEach(function (data) {
+    data.results.forEach(function (data) {
       var entry = data.entry;
 
       out.startElement("item")
@@ -195,6 +223,7 @@ async.auto({
   out.endDocument();
 
   if (data.spawn) {
+    console.log("REINDEX")
     spawn(process.execPath, [__filename, "--reindex"], { detached: true, stdio: "ignore" });
   }
 
