@@ -1,7 +1,7 @@
 alfred-pinboard
 ===============
 
-Pinboard Search Weorkflow for Alfred 2
+Pinboard Search Workflow for Alfred 2
 
 Install: http://d.eknkc.com/L6QO
 
