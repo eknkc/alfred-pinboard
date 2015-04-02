@@ -51,7 +51,7 @@ async.auto({
     })
   }],
   checkAuth: ["config", "cache", function (next, data) {
-    if (argv.pbtoken && /^[^:]+:[0-9A-Z]+$/.test(argv.pbtoken)) {
+    if (argv.pbtoken && /^[^:]+:[0-9a-zA-Z]+$/.test(argv.pbtoken)) {
       data.config.token = argv.pbtoken;
       data.config.dirty = true;
 
